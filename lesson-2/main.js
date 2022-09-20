@@ -7,8 +7,10 @@ function main() {
         0.5,0.5, 0.0, 1.0, 1.0,
         0.5,-0.5, 0.0, 1.0, 0.0,
         -2.0,-0.5, 1.0, 0.0, 0.0,
+
         0.2,-0.2, 1.0, 1.0, 1.0,
         0.2,0.2, 1.0, 1.0, 1.0,
+
         -0.2,-0.2, 1.0, 1.0, 1.0,
         -0.35,-0.2, 1.0, 1.0, 1.0,
         -0.35,0.2, 1.0, 1.0, 1.0,
@@ -57,6 +59,15 @@ function main() {
     gl.linkProgram(shaderProgram);
     gl.useProgram(shaderProgram);
 
+
+    var toggle1 = false;
+    function onMouseClick (event){
+        toggle1 = !toggle1
+    }
+
+    document.addEventListener("pointerdown",onMouseClick);
+    document.addEventListener("pointerup",onMouseClick);
+
     var theta = 0.0;
     var left = true;
     var uTheta= gl.getUniformLocation(shaderProgram, "uTheta");
@@ -72,6 +83,8 @@ function main() {
         setTimeout( function() {
             gl.clearColor(0.0, 0.0,   0.0,  1.0);
             gl.clear(gl.COLOR_BUFFER_BIT);
+
+            //funne rotation
             if(left){
                 theta -= 0.05
                 if(theta < -2.0){
@@ -83,10 +96,16 @@ function main() {
                     left = true
                 }
             }
+
             gl.uniform1f(uTheta,  theta);
-            gl.drawArrays(gl.TRIANGLE_FAN, 0, 4);
+            if(toggle1){
+                gl.drawArrays(gl.TRIANGLE_FAN, 0, 4);
+                gl.drawArrays(gl.TRIANGLE_STRIP,6,4)
+            }else{
+                gl.drawArrays(gl.LINE_LOOP, 0, 4);
+                gl.drawArrays(gl.LINE_STRIP,6,4)
+            }
             gl.drawArrays(gl.POINTS,4,2);
-            gl.drawArrays(gl.LINE_STRIP,6,4)
             render();
         }, 1000/60);
     }
