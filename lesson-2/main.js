@@ -28,11 +28,14 @@ function main() {
         uniform float uTheta;
         varying vec3 vColor;
 
+        uniform float xAddition;
+        uniform float yAddition;
+
         void main () {
             gl_PointSize = 50.0;
             vec2 position = vec2(aPosition);
-            position.x = -sin(uTheta) * aPosition.x + cos(uTheta) * aPosition.y;
-            position.y = sin(uTheta) * aPosition.y + cos(uTheta) * aPosition.x;
+            position.x = -sin(uTheta) * (aPosition.x + xAddition) + cos(uTheta) * (aPosition.y + yAddition);
+            position.y = sin(uTheta) * (aPosition.y + yAddition) + cos(uTheta) * (aPosition.x + xAddition);
             gl_Position = vec4(position, 0.0, 1.0);
             vColor = aColor;
         }
@@ -65,12 +68,59 @@ function main() {
         toggle1 = !toggle1
     }
 
+    var thetaControl = 0.01;
+    function onKeyDown(event){
+        if(event.keyCode == 32){
+            thetaControl = 0.1;
+        }
+    }
+
+    function onKeyUp(event){
+        if(event.keyCode == 32){
+            thetaControl = 0.01;
+        }
+    }
+
     document.addEventListener("pointerdown",onMouseClick);
     document.addEventListener("pointerup",onMouseClick);
 
+    document.addEventListener("keydown",onKeyDown);
+    document.addEventListener("keyup", onKeyUp);
+
+    // UPDOWNLEFTRIGHT
+    var upPressed = false;
+    var downPressed = false;
+    var leftPressed = false;
+    var rightPressed = false;
+
+    function movementController(event){
+        if(event.keyCode == 38){
+            upPressed = !upPressed;
+        }
+        
+        if(event.keyCode == 40){
+            downPressed = !downPressed;
+        }
+        
+        if(event.keyCode == 37){
+            leftPressed = !leftPressed;
+        }
+        
+        if(event.keyCode == 39){
+            rightPressed = !rightPressed;
+        }
+    }
+
+    document.addEventListener("keydown",movementController);
+    document.addEventListener("keyup", movementController);
+
     var theta = 0.0;
     var left = true;
+    var xAdds = 0.0;
+    var yAdds = 0.0;
     var uTheta= gl.getUniformLocation(shaderProgram, "uTheta");
+    var xAddition= gl.getUniformLocation(shaderProgram, "xAddition");
+    var yAddition= gl.getUniformLocation(shaderProgram, "yAddition");
 
     var aPosition = gl.getAttribLocation(shaderProgram, "aPosition");
     var aColor = gl.getAttribLocation(shaderProgram,"aColor");
@@ -85,17 +135,36 @@ function main() {
             gl.clear(gl.COLOR_BUFFER_BIT);
 
             //funne rotation
-            if(left){
-                theta -= 0.05
-                if(theta < -2.0){
-                    left = false
-                }
-            }else{
-                theta += 0.01
-                if(theta > 2.0){
-                    left = true
-                }
+            // if(left){
+            //     theta -= thetaControl;
+            //     if(theta < -2.0){
+            //         left = false;
+            //     }
+            // }else{
+            //     theta +=thetaControl;
+            //     if(theta > 2.0){
+            //         left = true;
+            //     }
+            // }
+
+            if(upPressed){
+                xAdds += 0.01;
             }
+            
+            if(downPressed){
+                xAdds -=0.01;
+            }
+            
+            if(leftPressed){
+                yAdds -= 0.01;
+            }
+
+            if(rightPressed){
+                yAdds += 0.01;
+            }
+
+            gl.uniform1f(xAddition,xAdds);
+            gl.uniform1f(yAddition,yAdds);
 
             gl.uniform1f(uTheta,  theta);
             if(toggle1){
