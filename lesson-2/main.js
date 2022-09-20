@@ -6,7 +6,13 @@ function main() {
         -0.5,0.5,
         0.5,0.5,
         0.5,-0.5,
-        -0.5,-0.5
+        -0.5,-0.5,
+        0.2,-0.2,
+        0.2,0.2,
+        -0.2,-0.2,
+        -0.35,-0.2,
+        -0.35,0.2,
+        -0.2,0.2
     ];
 
     var buffer = gl.createBuffer();
@@ -15,14 +21,15 @@ function main() {
 
     // VERTEX SHADER
     var vertexShaderCode = `
-        attribute vec4 aPosition;
+        attribute vec2 aPosition;
         uniform float uTheta;
 
         void main () {
-            gl_Position.x = -sin(uTheta) * aPosition.x + cos(uTheta) * aPosition.y;
-            gl_Position.y = sin(uTheta) * aPosition.y + cos(uTheta) * aPosition.x;
-            gl_Position.z = 0.0;
-            gl_Position.w = 1.0;
+            gl_PointSize = 5.0;
+            vec2 position = vec2(aPosition);
+            position.x = -sin(uTheta) * aPosition.x + cos(uTheta) * aPosition.y;
+            position.y = sin(uTheta) * aPosition.y + cos(uTheta) * aPosition.x;
+            gl_Position = vec4(position, 0.0, 1.0);
         }
     `;
     var vertexShader = gl.createShader(gl.VERTEX_SHADER);
@@ -45,20 +52,23 @@ function main() {
     gl.linkProgram(shaderProgram);
     gl.useProgram(shaderProgram);
 
+    var theta = 0.0;
+    var uTheta= gl.getUniformLocation(shaderProgram, "uTheta");
+
     var aPosition = gl.getAttribLocation(shaderProgram, "aPosition");
     gl.vertexAttribPointer(aPosition, 2, gl.FLOAT, false, 0, 0);
     gl.enableVertexAttribArray(aPosition);
 
-    var theta;
-    var uTheta= gl.getUniformLocation(shaderProgram, "uTheta");
-
     function render(){
         gl.clearColor(0.0, 0.0,   0.0,  1.0);
         gl.clear(gl.COLOR_BUFFER_BIT);
-        theta+= 0.1;
+        theta -= 0.1;
         gl.uniform1f(uTheta,  theta);
-        gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+        gl.drawArrays(gl.LINE_LOOP, 0, 4);
+        gl.drawArrays(gl.POINTS,4,2);
+        gl.drawArrays(gl.LINE_STRIP,6,4)
+
     }
 
-    setInterval(render, 1000/30);
+    setInterval(render, 1000/5);
 }
