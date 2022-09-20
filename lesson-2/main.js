@@ -3,16 +3,10 @@ function main() {
     var gl = canvas.getContext("webgl");
 
     var vertices = [
-        -0.1,0.1,
-        -0.3,0.3,
         -0.5,0.5,
-        -0.7,0.7,
-        -0.9,0.9,
-        0.1, 0.1,
-        0.3,-0.3,
+        0.5,0.5,
         0.5,-0.5,
-        0.7,-0.7,
-        0.9,0.9
+        -0.5,-0.5
     ];
 
     var buffer = gl.createBuffer();
@@ -34,7 +28,7 @@ function main() {
     // FRAGMENT SHADER
     var fragmentShaderCode = `
         void main() {
-            gl_FragColor = vec4(1.0, 0.8, 0.8, 1.0);
+            gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);
         }
     `;
     var fragmentShader = gl.createShader(gl.FRAGMENT_SHADER);
@@ -47,12 +41,12 @@ function main() {
     gl.linkProgram(shaderProgram);
     gl.useProgram(shaderProgram);
 
-    gl.clearColor(0.2, 0.1,   0.0,  1.0);
+    gl.clearColor(0.0, 0.0,   0.0,  1.0);
     gl.clear(gl.COLOR_BUFFER_BIT);
 
     var aPosition = gl.getAttribLocation(shaderProgram, "aPosition");
     gl.vertexAttribPointer(aPosition, 2, gl.FLOAT, false, 0, 0);
     gl.enableVertexAttribArray(aPosition);
 
-    gl.drawArrays(gl.TRIANGLE_FAN, 0, 10);
+    gl.drawArrays(gl.TRIANGLE_FAN, 0, 4);
 }
