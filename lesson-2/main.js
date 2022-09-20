@@ -25,7 +25,7 @@ function main() {
         uniform float uTheta;
 
         void main () {
-            gl_PointSize = 5.0;
+            gl_PointSize = 50.0;
             vec2 position = vec2(aPosition);
             position.x = -sin(uTheta) * aPosition.x + cos(uTheta) * aPosition.y;
             position.y = sin(uTheta) * aPosition.y + cos(uTheta) * aPosition.x;
@@ -60,15 +60,17 @@ function main() {
     gl.enableVertexAttribArray(aPosition);
 
     function render(){
-        gl.clearColor(0.0, 0.0,   0.0,  1.0);
-        gl.clear(gl.COLOR_BUFFER_BIT);
-        theta -= 0.1;
-        gl.uniform1f(uTheta,  theta);
-        gl.drawArrays(gl.LINE_LOOP, 0, 4);
-        gl.drawArrays(gl.POINTS,4,2);
-        gl.drawArrays(gl.LINE_STRIP,6,4)
-
+        setTimeout( function() {
+            gl.clearColor(0.0, 0.0,   0.0,  1.0);
+            gl.clear(gl.COLOR_BUFFER_BIT);
+            theta -= 0.1;
+            gl.uniform1f(uTheta,  theta);
+            gl.drawArrays(gl.LINE_LOOP, 0, 4);
+            gl.drawArrays(gl.POINTS,4,2);
+            gl.drawArrays(gl.LINE_STRIP,6,4)
+            render();
+        }, 1000/60);
     }
 
-    setInterval(render, 1000/5);
+    render();
 }
