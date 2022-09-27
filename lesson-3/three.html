@@ -7,10 +7,77 @@
     <title>Document</title>
 </head>
 <body>
-    <script> src="three.js"</script>
+    <script src="three.js"></script>
     <script>
         const scene = new THREE.Scene();
-        const camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
+        const camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 0.1, 1000 );
+
+        const renderer = new THREE.WebGLRenderer();
+        renderer.setSize( window.innerWidth, window.innerHeight );
+        renderer.shadowMap.enabled = true
+        document.body.appendChild( renderer.domElement );
+
+        // INIT HEMISPHERE LIGHT
+        scene.add(new THREE.AmbientLight( 0xffffff, 0.5 ));
+
+        const torusTexture = new THREE.TextureLoader().load('colormap_ocean.jpg')
+
+        // TORUS
+        const torus = new THREE.Mesh(new THREE.TorusGeometry(0.5, 0.1, 24, 10), new THREE.MeshPhongMaterial({ map: torusTexture, emissiveMap: torusTexture,shininess: 100 }))
+        torus.position.y = -1;
+        torus.receiveShadow = true
+        torus.castShadow = true
+        scene.add(torus)
+
+        const floorTexture = new THREE.TextureLoader().load('eeee.png')
+
+        // FLOOR
+        const plane = new THREE.Mesh(new THREE.PlaneGeometry(10, 10, 4), new THREE.MeshPhongMaterial({ map: floorTexture}));
+        plane.position.y = -1;
+        plane.rotation.x = - Math.PI / 2;
+        plane.receiveShadow = true;
+        plane.castShadow = true;
+        scene.add(plane);
+
+        // DIRECTIONAL LIGHT
+        const directionalLight = new THREE.DirectionalLight(0xffffff, 0.4);
+        directionalLight.position.x += 20
+        directionalLight.position.y += 10
+        directionalLight.position.z += 20
+        directionalLight.castShadow = true
+        directionalLight.shadow.mapSize.width = 4096;
+        directionalLight.shadow.mapSize.height = 4096;
+        const d = 25;
+        directionalLight.shadow.camera.left = - d;
+        directionalLight.shadow.camera.right = d;
+        directionalLight.shadow.camera.top = d;
+        directionalLight.shadow.camera.bottom = - d;
+        scene.add(directionalLight);
+
+        //scene.add( new THREE.CameraHelper( directionalLight.shadow.camera ) );
+
+        camera.position.z = 5;
+
+        function animate() {
+            requestAnimationFrame( animate );
+
+            // TARGET
+            const time = Date.now() * 0.0005;
+            directionalLight.position.x = Math.sin(time * 1.2) * 20;
+            directionalLight.position.z = Math.cos(time * 1.2) * 20;
+
+            plane.rotation.z += 0.01;
+
+            torus.rotation.x += 0.1;
+            torus.rotation.z += 0.1;
+            torus.rotation.y += 0.001;
+
+            torus.position.y += 0.001;
+
+            renderer.render( scene, camera );
+        };
+
+        animate();
     </script>
 </body>
 </html>
